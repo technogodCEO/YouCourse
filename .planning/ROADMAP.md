@@ -28,7 +28,10 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. User can log in and remain logged in across browser refresh and tab close/reopen
   3. User can reset a forgotten password via an emailed link and regain access
   4. Protected routes redirect unauthenticated users to login; authenticated users pass through
-**Plans**: TBD
+**Plans**: 3 plans
+- [ ] 01-01-PLAN.md — Project scaffold, Drizzle schema, Auth.js v5 config + session/DAL foundation
+- [ ] 01-02-PLAN.md — Sign-up, login, session persistence, protected dashboard, proxy.ts route protection
+- [ ] 01-03-PLAN.md — Password reset flow (Resend email + token table + forgot/reset pages)
 **UI hint**: yes
 
 ### Phase 2: AI Ingestion Pipeline
@@ -75,7 +78,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Foundation | 0/TBD | Not started | - |
+| 1. Foundation | 0/3 | Planned | - |
 | 2. AI Ingestion Pipeline | 0/TBD | Not started | - |
 | 3. Course Creation & Publishing | 0/TBD | Not started | - |
 | 4. Learner Flow & Catalog | 0/TBD | Not started | - |
