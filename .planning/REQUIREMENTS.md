@@ -9,7 +9,6 @@
 
 - [x] **AUTH-01**: User can sign up with email and password
 - [x] **AUTH-02**: User can log in with email and password
-- [ ] **AUTH-03**: User can reset password via email link
 - [x] **AUTH-04**: User session persists across browser refresh
 
 ### Course Generation
@@ -19,23 +18,17 @@
 - [ ] **CGEN-03**: System searches YouTube and selects the best-matching video for each curriculum lesson
 - [ ] **CGEN-04**: System fetches video metadata and transcripts at generation time and caches them
 - [ ] **CGEN-05**: System batch-generates comprehension questions for each video from its cached transcript using an LLM
-- [ ] **CGEN-06**: User can set a course as public (discoverable) or private (link-only) before publishing
+- [ ] **CGEN-06**: User can set a course as public or private (link-only) before publishing
 - [ ] **CGEN-07**: User can give the generated course a title and description before publishing
 
 ### Learner Flow
 
 - [ ] **LRNN-01**: User can view a course detail page showing the curriculum and video list
-- [ ] **LRNN-02**: User can enroll in a course to start learning
 - [ ] **LRNN-03**: User watches the current video embedded in the app
 - [ ] **LRNN-04**: User is presented with comprehension questions after completing each video
 - [ ] **LRNN-05**: User must achieve the passing score (≥70%) on the quiz to unlock the next video
 - [ ] **LRNN-06**: User can retry the quiz if they fail
 - [ ] **LRNN-07**: User's progress is saved and resumes from their last completed video on return
-
-### Catalog
-
-- [ ] **CTLG-01**: Public courses appear in a browsable catalog
-- [ ] **CTLG-02**: Logged-in user can view the catalog and open course detail pages
 
 ## v2 Requirements
 
@@ -53,9 +46,10 @@
 
 ### Discovery
 
-- **CTLG-v2-01**: Catalog supports keyword search by topic
-- **CTLG-v2-02**: Catalog supports filtering by course length or subject area
-- **CTLG-v2-03**: Anonymous (non-logged-in) users can browse the public catalog
+- **CTLG-v2-01**: Public courses appear in a browsable catalog
+- **CTLG-v2-02**: Catalog supports keyword search by topic
+- **CTLG-v2-03**: Catalog supports filtering by course length or subject area
+- **CTLG-v2-04**: Anonymous users can browse the public catalog
 
 ### Monetization
 
@@ -66,6 +60,10 @@
 
 | Feature | Reason |
 |---------|--------|
+| Password reset via email | Deferred — forgotten passwords not recoverable in POC |
+| Explicit course enrollment | Opening a course starts it; no separate enroll step needed for POC |
+| Public course catalog | Share by direct link in POC; catalog is v2 |
+| Per-video ingestion status polling | Simplified to "generating…" then redirect when ready |
 | OAuth login (Google/GitHub) | Email/password sufficient for v1; adds complexity |
 | Email verification on sign-up | Reduces friction for v1; add when spam becomes a concern |
 | Native mobile app | Mobile-responsive web covers v1 needs |
@@ -82,7 +80,6 @@
 |-------------|-------|--------|
 | AUTH-01 | Phase 1 | Complete |
 | AUTH-02 | Phase 1 | Complete |
-| AUTH-03 | Phase 1 | Pending |
 | AUTH-04 | Phase 1 | Complete |
 | CGEN-01 | Phase 3 | Pending |
 | CGEN-02 | Phase 2 | Pending |
@@ -92,20 +89,17 @@
 | CGEN-06 | Phase 3 | Pending |
 | CGEN-07 | Phase 3 | Pending |
 | LRNN-01 | Phase 4 | Pending |
-| LRNN-02 | Phase 4 | Pending |
 | LRNN-03 | Phase 4 | Pending |
 | LRNN-04 | Phase 4 | Pending |
 | LRNN-05 | Phase 4 | Pending |
 | LRNN-06 | Phase 4 | Pending |
 | LRNN-07 | Phase 4 | Pending |
-| CTLG-01 | Phase 4 | Pending |
-| CTLG-02 | Phase 4 | Pending |
 
 **Coverage:**
-- v1 requirements: 20 total
-- Mapped to phases: 20
+- v1 requirements: 16 total
+- Mapped to phases: 16
 - Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-05-30*
-*Last updated: 2026-05-30 after roadmap creation*
+*Last updated: 2026-05-30 — POC scope cut (AUTH-03, LRNN-02, CTLG-01/02 deferred)*
