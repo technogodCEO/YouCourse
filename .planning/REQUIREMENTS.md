@@ -78,36 +78,34 @@
 
 ## Traceability
 
-*(Populated during roadmap creation)*
-
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AUTH-01 | — | Pending |
-| AUTH-02 | — | Pending |
-| AUTH-03 | — | Pending |
-| AUTH-04 | — | Pending |
-| CGEN-01 | — | Pending |
-| CGEN-02 | — | Pending |
-| CGEN-03 | — | Pending |
-| CGEN-04 | — | Pending |
-| CGEN-05 | — | Pending |
-| CGEN-06 | — | Pending |
-| CGEN-07 | — | Pending |
-| LRNN-01 | — | Pending |
-| LRNN-02 | — | Pending |
-| LRNN-03 | — | Pending |
-| LRNN-04 | — | Pending |
-| LRNN-05 | — | Pending |
-| LRNN-06 | — | Pending |
-| LRNN-07 | — | Pending |
-| CTLG-01 | — | Pending |
-| CTLG-02 | — | Pending |
+| AUTH-01 | Phase 1 | Pending |
+| AUTH-02 | Phase 1 | Pending |
+| AUTH-03 | Phase 1 | Pending |
+| AUTH-04 | Phase 1 | Pending |
+| CGEN-01 | Phase 3 | Pending |
+| CGEN-02 | Phase 2 | Pending |
+| CGEN-03 | Phase 2 | Pending |
+| CGEN-04 | Phase 2 | Pending |
+| CGEN-05 | Phase 2 | Pending |
+| CGEN-06 | Phase 3 | Pending |
+| CGEN-07 | Phase 3 | Pending |
+| LRNN-01 | Phase 4 | Pending |
+| LRNN-02 | Phase 4 | Pending |
+| LRNN-03 | Phase 4 | Pending |
+| LRNN-04 | Phase 4 | Pending |
+| LRNN-05 | Phase 4 | Pending |
+| LRNN-06 | Phase 4 | Pending |
+| LRNN-07 | Phase 4 | Pending |
+| CTLG-01 | Phase 4 | Pending |
+| CTLG-02 | Phase 4 | Pending |
 
 **Coverage:**
 - v1 requirements: 20 total
-- Mapped to phases: 0 (pending roadmap)
-- Unmapped: 20 ⚠️
+- Mapped to phases: 20
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-05-30*
-*Last updated: 2026-05-30 after initial definition*
+*Last updated: 2026-05-30 after roadmap creation*
