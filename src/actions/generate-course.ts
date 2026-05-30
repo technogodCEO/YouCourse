@@ -5,7 +5,6 @@ import { courses, lessons, questions } from "@/lib/db/schema"
 import { verifySession } from "@/lib/dal"
 import { generateCurriculum } from "@/lib/ai/curriculum"
 import { searchYouTubeVideo } from "@/lib/youtube/search"
-import { fetchTranscript } from "@/lib/youtube/transcript"
 import { generateQuestions } from "@/lib/ai/questions"
 import { eq } from "drizzle-orm"
 
@@ -69,14 +68,11 @@ export async function generateCourse(
             videoDurationSeconds: video.durationSeconds,
           }).where(eq(lessons.id, lessonId))
 
-          const transcript = await fetchTranscript(video.videoId)
+          const qs = await generateQuestions(null, lessonTopic, video.title)
 
           await db.update(lessons).set({
-            transcriptCached: transcript ?? null,
-            transcriptStatus: transcript ? "fetched" : "unavailable",
+            transcriptStatus: "unavailable",
           }).where(eq(lessons.id, lessonId))
-
-          const qs = await generateQuestions(transcript, lessonTopic, video.title)
           await db.insert(questions).values(
             qs.map((q, i) => ({
               lessonId,

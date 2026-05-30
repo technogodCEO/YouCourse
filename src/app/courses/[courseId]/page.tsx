@@ -109,9 +109,6 @@ export default async function CoursePage({ params }: { params: Promise<{ courseI
                 {lesson.videoDurationSeconds && (
                   <p className="text-[13px] text-[--text-secondary] mt-0.5">{formatDuration(lesson.videoDurationSeconds)}</p>
                 )}
-                {lesson.transcriptStatus === "unavailable" && (
-                  <p className="text-[12px] text-amber-600 mt-0.5">No questions — transcript unavailable</p>
-                )}
               </div>
             </div>
           ))}

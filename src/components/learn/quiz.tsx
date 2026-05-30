@@ -37,6 +37,7 @@ export function Quiz({ lessonId, questions, onPassed }: Props) {
   return (
     <div className="flex flex-col gap-6">
       <h2 className="text-[20px] font-semibold text-[--text-primary]">Comprehension Quiz</h2>
+      <p className="text-[13px] text-[--text-secondary] -mt-4">Questions are based on general best practices for this topic and may not reflect the specific approach taken in the video.</p>
 
       {questions.map((q, qi) => (
         <div key={q.id} className="flex flex-col gap-3">
