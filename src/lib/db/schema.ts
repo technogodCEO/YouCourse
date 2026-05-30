@@ -34,10 +34,3 @@ export const verificationTokens = pgTable("verification_tokens", {
 }, (vt) => ({
   compoundKey: primaryKey({ columns: [vt.identifier, vt.token] }),
 }))
-
-export const passwordResetTokens = pgTable("password_reset_tokens", {
-  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
-  email: text("email").notNull(),
-  token: text("token").notNull().unique(),
-  expires: timestamp("expires", { mode: "date" }).notNull(),
-})
