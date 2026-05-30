@@ -59,7 +59,7 @@ decisions:
 metrics:
   duration_seconds: 487
   completed_date: "2026-05-30"
-  tasks_completed: 3
+  tasks_completed: 4
   tasks_total: 4
   files_created: 14
   files_modified: 4
@@ -80,7 +80,7 @@ Establish the complete shared foundation that both auth feature plans (sign-up/l
 | 1 | Scaffold Next.js 16 + install all auth/DB dependencies | fff3288 | Complete |
 | 2 | Define Drizzle schema, DB client, config, env template | 8d94dbd | Complete |
 | 3 | Auth.js config, session helpers, Zod defs, DAL, route handler, root layout | 2bcc489 | Complete |
-| 4 | Provision Neon + Resend, supply env vars, push schema, verify build | — | CHECKPOINT (human required) |
+| 4 | Provision Neon + Resend, supply env vars, push schema, verify build | human-verified | Complete |
 
 ## Contract Module Exports
 
@@ -125,10 +125,10 @@ export async function getUser(): Promise<User | null>
 
 | Variable | Source | Status |
 |----------|--------|--------|
-| `DATABASE_URL` | Neon Console -> Project -> Connection Details (pooled) | Missing — human must supply |
+| `DATABASE_URL` | Neon Console -> Project -> Connection Details (pooled) | Present in .env.local |
 | `AUTH_SECRET` | Generated via openssl rand -base64 32 | Present in .env.local |
-| `RESEND_API_KEY` | Resend Dashboard -> API Keys | Missing — human must supply |
-| `NEXT_PUBLIC_APP_URL` | Set to http://localhost:3000 for dev | Missing — human must supply |
+| `RESEND_API_KEY` | Resend Dashboard -> API Keys | Present in .env.local |
+| `NEXT_PUBLIC_APP_URL` | Set to http://localhost:3000 for dev | Present in .env.local |
 
 ## Scaffold Approach
 
@@ -207,12 +207,12 @@ All created files verified to exist. All commits verified in git log.
 - FOUND commit: 8d94dbd (Task 2)
 - FOUND commit: 2bcc489 (Task 3)
 
-## Pending: Task 4 (Checkpoint)
+## Task 4: Checkpoint Verification (Complete)
 
-The following manual steps are still required before this plan is complete:
-1. Create Neon project at https://neon.tech and copy the pooled connection string
-2. Create Resend account at https://resend.com and get an API key
-3. Add `DATABASE_URL`, `RESEND_API_KEY`, `NEXT_PUBLIC_APP_URL` to `.env.local`
-4. Run `DATABASE_URL="<url>" npx drizzle-kit push` to create 4 tables in Neon
-5. Run `npm run build` to confirm production build passes with real credentials
-6. Run `npm run dev` and confirm dark `#0D1B2A` background at localhost:3000
+Human-verified 2026-05-30. All steps confirmed:
+1. Neon project created; pooled connection string added to `.env.local`
+2. Resend account provisioned; API key added to `.env.local`
+3. `DATABASE_URL`, `RESEND_API_KEY`, `NEXT_PUBLIC_APP_URL`, `AUTH_SECRET` all present in `.env.local`
+4. `npx drizzle-kit push` created 4 tables in Neon: users, accounts, verification_tokens, password_reset_tokens
+5. `npm run build` passed: Next.js 16.2.6 compiled successfully, zero TypeScript errors
+6. Dev server renders dark `#0D1B2A` background at localhost:3000
