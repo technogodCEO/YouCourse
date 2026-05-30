@@ -58,10 +58,7 @@ export async function generateCourse(
       lessonRows.map(async ({ id: lessonId, topic: lessonTopic }) => {
         const video = await searchYouTubeVideo(lessonTopic)
         if (!video) {
-          await db
-            .update(lessons)
-            .set({ transcriptStatus: "unavailable" })
-            .where(eq(lessons.id, lessonId))
+          await db.update(lessons).set({ transcriptStatus: "unavailable" }).where(eq(lessons.id, lessonId))
           return
         }
 
