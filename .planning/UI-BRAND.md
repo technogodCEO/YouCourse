@@ -15,7 +15,7 @@ YouCourse (mixed case, one word — never "Youcourse", "you course", or "YOUCOUR
 Sharp, modern, dark-first. This is a serious learner tool — not edutainment, not a social feed. The aesthetic is technical and focused: closer to a developer tool or professional SaaS than a consumer education platform. Every visual choice should communicate deliberate structure and forward momentum.
 
 ### Tagline
-**"Learn with proof."**
+**"Construct your mind"**
 
 Rationale: The core value is provable comprehension. The tagline is short (3 words), confident, and memorable. Pair with the sub-tagline "Not just views — verified understanding." on marketing surfaces.
 
