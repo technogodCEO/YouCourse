@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, primaryKey, integer } from "drizzle-orm/pg-core"
+import { pgTable, text, timestamp, primaryKey, integer, boolean, unique } from "drizzle-orm/pg-core"
 
 export const users = pgTable("users", {
   id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
@@ -33,4 +33,51 @@ export const verificationTokens = pgTable("verification_tokens", {
   expires: timestamp("expires", { mode: "date" }).notNull(),
 }, (vt) => ({
   compoundKey: primaryKey({ columns: [vt.identifier, vt.token] }),
+}))
+
+export const courses = pgTable("courses", {
+  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  creatorId: text("creator_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  title: text("title").notNull(),
+  description: text("description"),
+  topic: text("topic").notNull(),
+  lengthPreset: text("length_preset").notNull(),
+  visibility: text("visibility").notNull().default("private"),
+  status: text("status").notNull().default("generating"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+})
+
+export const lessons = pgTable("lessons", {
+  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  courseId: text("course_id").notNull().references(() => courses.id, { onDelete: "cascade" }),
+  position: integer("position").notNull(),
+  topic: text("topic").notNull(),
+  youtubeVideoId: text("youtube_video_id"),
+  videoTitle: text("video_title"),
+  videoDurationSeconds: integer("video_duration_seconds"),
+  transcriptCached: text("transcript_cached"),
+  transcriptStatus: text("transcript_status").notNull().default("pending"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+})
+
+export const questions = pgTable("questions", {
+  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  lessonId: text("lesson_id").notNull().references(() => lessons.id, { onDelete: "cascade" }),
+  position: integer("position").notNull(),
+  questionText: text("question_text").notNull(),
+  options: text("options").notNull(),
+  correctIndex: integer("correct_index").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+})
+
+export const userProgress = pgTable("user_progress", {
+  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  userId: text("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+  courseId: text("course_id").notNull().references(() => courses.id, { onDelete: "cascade" }),
+  lessonId: text("lesson_id").notNull().references(() => lessons.id, { onDelete: "cascade" }),
+  passedQuiz: boolean("passed_quiz").notNull().default(false),
+  completedAt: timestamp("completed_at"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (t) => ({
+  unq: unique().on(t.userId, t.lessonId),
 }))

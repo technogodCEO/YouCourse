@@ -14,11 +14,6 @@ export default function LoginPage() {
           Create one
         </Link>
       </p>
-      <p className="mt-3 text-center text-[14px] text-[--text-secondary]">
-        <Link href="/forgot-password" className="text-[--text-secondary] hover:text-[--text-primary] transition-colors duration-150">
-          Forgot your password?
-        </Link>
-      </p>
     </>
   )
 }
