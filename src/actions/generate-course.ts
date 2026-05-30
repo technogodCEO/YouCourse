@@ -53,38 +53,42 @@ export async function generateCourse(
       lessonRows.push({ id: row.id, topic: lessonTopics[i] })
     }
 
-    // Process all lessons in parallel
+    // Process all lessons in parallel — errors are isolated per lesson
     await Promise.all(
       lessonRows.map(async ({ id: lessonId, topic: lessonTopic }) => {
-        const video = await searchYouTubeVideo(lessonTopic)
-        if (!video) {
+        try {
+          const video = await searchYouTubeVideo(lessonTopic)
+          if (!video) {
+            await db.update(lessons).set({ transcriptStatus: "unavailable" }).where(eq(lessons.id, lessonId))
+            return
+          }
+
+          await db.update(lessons).set({
+            youtubeVideoId: video.videoId,
+            videoTitle: video.title,
+            videoDurationSeconds: video.durationSeconds,
+          }).where(eq(lessons.id, lessonId))
+
+          const transcript = await fetchTranscript(video.videoId)
+
+          await db.update(lessons).set({
+            transcriptCached: transcript ?? null,
+            transcriptStatus: transcript ? "fetched" : "unavailable",
+          }).where(eq(lessons.id, lessonId))
+
+          const qs = await generateQuestions(transcript, lessonTopic, video.title)
+          await db.insert(questions).values(
+            qs.map((q, i) => ({
+              lessonId,
+              position: i,
+              questionText: q.question_text,
+              options: JSON.stringify(q.options),
+              correctIndex: q.correct_index,
+            }))
+          )
+        } catch {
           await db.update(lessons).set({ transcriptStatus: "unavailable" }).where(eq(lessons.id, lessonId))
-          return
         }
-
-        await db.update(lessons).set({
-          youtubeVideoId: video.videoId,
-          videoTitle: video.title,
-          videoDurationSeconds: video.durationSeconds,
-        }).where(eq(lessons.id, lessonId))
-
-        const transcript = await fetchTranscript(video.videoId)
-
-        await db.update(lessons).set({
-          transcriptCached: transcript ?? null,
-          transcriptStatus: transcript ? "fetched" : "unavailable",
-        }).where(eq(lessons.id, lessonId))
-
-        const qs = await generateQuestions(transcript, lessonTopic, video.title)
-        await db.insert(questions).values(
-          qs.map((q, i) => ({
-            lessonId,
-            position: i,
-            questionText: q.question_text,
-            options: JSON.stringify(q.options),
-            correctIndex: q.correct_index,
-          }))
-        )
       })
     )
 
