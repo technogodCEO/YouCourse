@@ -44,7 +44,7 @@ requirements_completed: [AUTH-01, AUTH-02, AUTH-04]
 metrics:
   duration_seconds: 454
   completed_date: "2026-05-30"
-  tasks_completed: 3
+  tasks_completed: 4
   tasks_total: 4
   files_created: 9
   files_modified: 0
@@ -52,7 +52,7 @@ metrics:
 
 # Phase 1 Plan 2: Auth Flows Summary
 
-**One-liner:** Signup/login/logout Server Actions with bcrypt + Zod, branded useActionState client forms, protected /dashboard with getUser(), and Auth.js auth() wrapper in proxy.ts enforcing D-08/D-09/D-10 — awaiting human browser verification for AUTH-01/AUTH-02/AUTH-04.
+**One-liner:** Signup/login/logout Server Actions with bcrypt + Zod, branded useActionState client forms, protected /dashboard with getUser(), and Auth.js auth() wrapper in src/proxy.ts enforcing D-08/D-09/D-10 — all 7 browser verification steps passed (AUTH-01, AUTH-02, AUTH-04 confirmed).
 
 ## Objective
 
@@ -65,7 +65,7 @@ Build the sign-up and login flows (AUTH-01, AUTH-02), session persistence across
 | 1 | signup/login/logout Server Actions | de714f1 | Complete |
 | 2 | Auth layout, signup/login pages, client forms, logout button | c865d91 | Complete |
 | 3 | Protected dashboard page + proxy.ts route protection | b6d057b | Complete |
-| 4 | Human browser verification | — | PENDING CHECKPOINT |
+| 4 | Human browser verification | 3bc8e41 | Complete |
 
 ## Key Implementation Notes
 
@@ -117,13 +117,7 @@ Routes: / /_not-found /api/auth/[...nextauth] /dashboard /login /signup
 
 **Total deviations:** 2 auto-fixed. **Impact:** None — deviations improved code cleanliness without changing behavior.
 
-## Pending Checkpoint
-
-Task 4 requires human browser verification of AUTH-01, AUTH-02, AUTH-04, and proxy.ts behavior. Cannot be automated — requires a live browser with DATABASE_URL and AUTH_SECRET set.
-
-See checkpoint section below.
-
-## Self-Check: PASSED (Tasks 1-3)
+## Self-Check: PASSED (All Tasks)
 
 All created files verified to exist. All commits verified in git log.
 
