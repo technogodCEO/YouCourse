@@ -72,20 +72,13 @@ export async function generateCourse(
         }).where(eq(lessons.id, lessonId))
 
         const transcript = await fetchTranscript(video.videoId)
-        if (!transcript) {
-          await db
-            .update(lessons)
-            .set({ transcriptStatus: "unavailable" })
-            .where(eq(lessons.id, lessonId))
-          return
-        }
 
         await db.update(lessons).set({
-          transcriptCached: transcript,
-          transcriptStatus: "fetched",
+          transcriptCached: transcript ?? null,
+          transcriptStatus: transcript ? "fetched" : "unavailable",
         }).where(eq(lessons.id, lessonId))
 
-        const qs = await generateQuestions(transcript, lessonTopic)
+        const qs = await generateQuestions(transcript, lessonTopic, video.title)
         await db.insert(questions).values(
           qs.map((q, i) => ({
             lessonId,
