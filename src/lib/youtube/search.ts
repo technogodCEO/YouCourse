@@ -13,6 +13,7 @@ function parseIso8601Duration(duration: string): number {
 
 export async function searchYouTubeVideo(topic: string): Promise<VideoResult | null> {
   const key = process.env.YOUTUBE_API_KEY
+  if (!key) throw new Error("YOUTUBE_API_KEY environment variable is not set")
   const searchUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&videoCaption=closedCaption&maxResults=1&q=${encodeURIComponent(topic)}&key=${key}`
   const searchRes = await fetch(searchUrl)
   const searchData = await searchRes.json()

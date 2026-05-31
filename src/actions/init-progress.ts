@@ -1,7 +1,7 @@
 "use server"
 
 import { db } from "@/lib/db"
-import { lessons, userProgress } from "@/lib/db/schema"
+import { courses, lessons, userProgress } from "@/lib/db/schema"
 import { verifySession } from "@/lib/dal"
 import { eq } from "drizzle-orm"
 
@@ -13,8 +13,11 @@ export async function initProgress(courseId: string): Promise<void> {
     return
   }
 
-  const courseLessons = await db.query.lessons.findMany({ where: eq(lessons.courseId, courseId) })
+  const course = await db.query.courses.findFirst({ where: eq(courses.id, courseId) })
+  if (!course || course.status !== "ready") return
+  if (course.visibility !== "public" && course.creatorId !== session.userId) return
 
+  const courseLessons = await db.query.lessons.findMany({ where: eq(lessons.courseId, courseId) })
   if (!courseLessons.length) return
 
   await db

@@ -2,9 +2,12 @@ import { drizzle } from "drizzle-orm/neon-http"
 import { neon } from "@neondatabase/serverless"
 import * as schema from "./schema"
 
-// DATABASE_URL is required at runtime but may not be present during the
-// TypeScript compilation phase. We use a placeholder that drizzle accepts
-// so module evaluation does not throw during `next build` static analysis.
-const sql = neon(process.env.DATABASE_URL ?? "postgresql://placeholder:placeholder@localhost/placeholder")
+// DATABASE_URL must be set at runtime. During `next build` static analysis the
+// module is not executed, so this check only fires on actual server startup.
+const dbUrl = process.env.DATABASE_URL
+if (!dbUrl && process.env.NODE_ENV !== "test") {
+  throw new Error("DATABASE_URL environment variable is not set")
+}
+const sql = neon(dbUrl ?? "postgresql://placeholder:placeholder@localhost/placeholder")
 
 export const db = drizzle(sql, { schema })

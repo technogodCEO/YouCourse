@@ -49,11 +49,15 @@ export default async function LessonPage({
   })
   const alreadyPassed = progressRow?.passedQuiz ?? false
 
-  const serializedQuestions = lessonQuestions.map((q) => ({
-    id: q.id,
-    questionText: q.questionText,
-    options: JSON.parse(q.options) as string[],
-  }))
+  const serializedQuestions = lessonQuestions.flatMap((q) => {
+    try {
+      const opts = JSON.parse(q.options)
+      if (!Array.isArray(opts) || opts.length !== 4 || !opts.every((o) => typeof o === "string")) return []
+      return [{ id: q.id, questionText: q.questionText, options: opts as string[] }]
+    } catch {
+      return []
+    }
+  })
 
   return (
     <div className="min-h-screen bg-[--bg-base]">

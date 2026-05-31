@@ -13,7 +13,7 @@ type Props = {
 
 export function Quiz({ lessonId, questions, onPassed }: Props) {
   const [selected, setSelected] = useState<(number | null)[]>(questions.map(() => null))
-  const [result, setResult] = useState<{ passed: boolean; score: number; correctAnswers: number[] } | null>(null)
+  const [result, setResult] = useState<{ passed: boolean; score: number; wrongIndexes?: number[] } | null>(null)
   const [isPending, setIsPending] = useState(false)
 
   const allAnswered = selected.every((s) => s !== null)
@@ -45,8 +45,8 @@ export function Quiz({ lessonId, questions, onPassed }: Props) {
           <div className="flex flex-col gap-2">
             {q.options.map((opt, oi) => {
               const isSelected = selected[qi] === oi
-              const isCorrect = result && result.correctAnswers[qi] === oi
-              const isWrong = result && isSelected && !isCorrect
+                const isWrong = result && !result.passed && result.wrongIndexes?.includes(qi) && isSelected
+              const isCorrect = result && !result.passed && isSelected && !isWrong
 
               return (
                 <button

@@ -16,10 +16,16 @@ export async function generateCourse(
   try {
     const session = await verifySession()
 
-    const topic = formData.get("topic") as string
-    const lengthPreset = formData.get("lengthPreset") as "quick" | "standard" | "long"
+    const topic = (formData.get("topic") as string)?.trim()
+    const lengthPresetRaw = formData.get("lengthPreset") as string
+    const validPresets = ["quick", "standard", "long"] as const
+    if (!validPresets.includes(lengthPresetRaw as typeof validPresets[number])) {
+      return { error: "Invalid length preset" }
+    }
+    const lengthPreset = lengthPresetRaw as "quick" | "standard" | "long"
 
-    if (!topic?.trim()) return { error: "Topic is required" }
+    if (!topic) return { error: "Topic is required" }
+    if (topic.length > 200) return { error: "Topic must be 200 characters or less" }
 
     const [newCourse] = await db
       .insert(courses)
