@@ -279,7 +279,12 @@ Multiple generation quality tiers backed by different models, gated by subscript
 | Tier | Model | Strategy | Notes |
 |------|-------|----------|-------|
 | Free | `llama-4-scout` (current) | Parallel | Fast, cheap, good enough |
-| Pro | `llama-4-maverick` or `claude-sonnet` | Parallel | Higher quality questions |
-| Premium | `claude-opus` | Sequential (chained) | Slowest, most accurate — each step informed by prior |
+| Pro | `llama-4-maverick` | Parallel | Better reasoning, ~4x cost, same speed |
+| Premium | R1 → Scout chain | Sequential | R1 reasons, Scout formats to schema; highest open-model quality |
+| Premium+ (future) | Claude Opus or GPT-4o | Sequential | Proprietary model ceiling; add `@ai-sdk/anthropic` or `@ai-sdk/openai` when needed |
 
 **Sequential vs parallel:** parallel runs all lesson generations simultaneously (current approach — fast). Sequential chains them — curriculum informs video search, transcript informs question generation, prior questions inform subsequent ones — slower but more coherent across lessons. Worth exploring for premium tier where latency is acceptable.
+
+**R1 chain pattern:** R1 (DeepSeek-R1-Distill-Llama-70B) does not support `json_schema` natively but produces strong chain-of-thought reasoning. Chain it with Scout: R1 reasons through the problem, Scout takes R1's output and formats it into the Zod schema. Two API calls per step but significantly better question quality (distractors that actually distract, unambiguous correct answers).
+
+**Provider strategy:** Groq is the right choice now — fastest inference, cheapest pricing, clean structured outputs on Scout/Maverick, and the Vercel AI SDK abstracts the provider entirely. Switching to a hybrid (Groq for free/pro, Anthropic/OpenAI for premium) is a one-line change per call site when the time comes — just add `@ai-sdk/anthropic` or `@ai-sdk/openai`. No refactor needed. Stay on Groq until there's a specific reason to leave (quality ceiling, reliability at scale, or a tier that genuinely requires proprietary model reasoning).
