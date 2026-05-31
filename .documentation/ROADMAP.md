@@ -37,6 +37,7 @@ All four phases complete. Core learning loop is live: topic → AI-generated cou
 ### Monetization
 - **MON-v2-01** Private course paywall
 - **MON-v2-02** Creator receives payment on purchase
+- **MON-v2-03** Subscription tiers with tiered LLM quality — Free (Scout/parallel), Pro (Maverick or Sonnet/parallel), Premium (Opus/sequential). Sequential generation is slower but produces more coherent courses as each step is informed by prior outputs.
 
 ---
 
