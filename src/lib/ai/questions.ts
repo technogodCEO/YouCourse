@@ -31,6 +31,7 @@ export async function generateQuestions(
   const { object } = await generateObject({
     model: groq("llama-3.3-70b-versatile"),
     schema: QuestionsSchema,
+    mode: "json",
     prompt: `Generate exactly 5 comprehension questions for a video lesson about the following topic. Each question must have exactly 4 answer options and one correct answer (0-indexed). Topic: ${lessonTopic}\n\n${context}`,
   })
   return object.questions.slice(0, 5) as Question[]
