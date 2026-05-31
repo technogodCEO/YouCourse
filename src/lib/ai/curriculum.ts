@@ -15,7 +15,7 @@ export async function generateCurriculum(
 ): Promise<string[]> {
   const lessonCount = lessonCounts[lengthPreset]
   const { object } = await generateObject({
-    model: groq("llama-3.3-70b-versatile"),
+    model: groq("meta-llama/llama-4-scout-17b-16e-instruct"),
     schema: CurriculumSchema,
     prompt: `Generate exactly ${lessonCount} ordered lesson topics for a YouTube course about the following topic. Each topic should be a concise search query (5-10 words) that will find a good tutorial video. Topic: ${topic}`,
   })

@@ -29,7 +29,7 @@ export async function generateQuestions(
     : `No transcript is available. Generate questions based on what a viewer would typically learn from a video about the topic: ${lessonTopic}${videoTitle ? ` (video title: ${videoTitle})` : ""}.`
 
   const { object } = await generateObject({
-    model: groq("llama-3.3-70b-versatile"),
+    model: groq("meta-llama/llama-4-scout-17b-16e-instruct"),
     schema: QuestionsSchema,
     prompt: `Generate exactly 5 comprehension questions for a video lesson about the following topic. Each question must have exactly 4 answer options and one correct answer (0-indexed). Topic: ${lessonTopic}\n\n${context}`,
   })

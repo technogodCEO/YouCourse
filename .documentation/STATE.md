@@ -34,6 +34,7 @@
 | `ai` | ^6.0.193 | Vercel AI SDK |
 | `@ai-sdk/groq` | ^3.0.39 | Groq provider |
 | `@ai-sdk/google` | ^3.0.80 | Google provider (installed, not active) |
+
 | `bcryptjs` | ^3.0.3 | Password hashing (cost factor 12) |
 | `zod` | ^4.4.3 | Validation — use `z.string().email()` not `z.email()` (v3-compat API) |
 | `resend` | ^6.12.4 | Transactional email — password reset only |
@@ -205,7 +206,9 @@ userProgress
 
 ### LLM
 - `generateObject` with a Zod schema always — never `generateText` + regex + `JSON.parse`
-- Groq `llama-3.3-70b-versatile` — `@ai-sdk/google` is installed but not active
+- Groq `meta-llama/llama-4-scout-17b-16e-instruct` — ~5x cheaper than previous `llama-3.3-70b-versatile` ($0.11/$0.34 vs $0.59/$0.79 per 1M tokens), native `json_schema` structured outputs support
+- `llama-3.3-70b-versatile` does NOT support `json_schema` — do not switch back without verifying structured outputs support on the target model
+- `@ai-sdk/google` is installed but not active
 - LLM calls are server-only (`import "server-only"` at top of `lib/ai/*.ts`)
 - Topic capped at 200 chars to limit prompt injection surface and API spend
 
