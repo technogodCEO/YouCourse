@@ -18,8 +18,8 @@ All project state lives in `.documentation/`:
 | `ROADMAP.md` | Phase history, v2 plans, out-of-scope list |
 | `UI-BRAND.md` | Color system, typography, component primitives, accessibility |
 | `SECURITY-DEFERRED.md` | Known security issues deferred with rationale |
-| `.planning/HISTORY.md` | Index of all executed plans |
-| `.planning/NN-NN-*.md` | Individual plan and summary files |
+| `HISTORY.md` | Record of all executed plans and key decisions |
+| `.planning/` | Active plans only — work in progress |
 
 **Start here for context:** Read `STATE.md` first, then `ROADMAP.md`. For UI work, read `UI-BRAND.md` before writing any styles.
 
