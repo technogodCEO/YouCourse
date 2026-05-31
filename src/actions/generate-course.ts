@@ -79,7 +79,7 @@ export async function generateCourse(
           const qs = await generateQuestions(transcript, lessonTopic, video.title)
 
           await db.update(lessons).set({
-            transcriptCached: transcript !== null,
+            transcriptCached: transcript !== null ? "true" : null,
             transcriptStatus: "unavailable",
           }).where(eq(lessons.id, lessonId))
           await db.insert(questions).values(
