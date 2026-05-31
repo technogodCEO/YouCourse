@@ -1,6 +1,8 @@
 import { verifySession } from "@/lib/dal"
 import { GenerateForm } from "@/components/course/generate-form"
 
+export const maxDuration = 300
+
 export default async function GeneratePage() {
   await verifySession()
 
