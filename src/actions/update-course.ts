@@ -17,9 +17,14 @@ export async function updateCourse(
 
   const title = (formData.get("title") as string)?.trim()
   const description = (formData.get("description") as string)?.trim() || null
-  const visibility = formData.get("visibility") as "public" | "private"
+  const visibilityRaw = formData.get("visibility") as string
+  if (visibilityRaw !== "public" && visibilityRaw !== "private") {
+    return { error: "Invalid visibility value" }
+  }
+  const visibility = visibilityRaw as "public" | "private"
 
   if (!title) return { error: "Title is required" }
+  if (title.length > 200) return { error: "Title must be 200 characters or less" }
 
   await db.update(courses).set({ title, description, visibility }).where(eq(courses.id, courseId))
   return { success: true }

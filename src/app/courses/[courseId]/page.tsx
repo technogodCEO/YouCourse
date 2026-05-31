@@ -17,10 +17,10 @@ function formatDuration(seconds: number | null): string {
 
 export default async function CoursePage({ params }: { params: Promise<{ courseId: string }> }) {
   const { courseId } = await params
+  const session = await verifySession()
+
   const course = await db.query.courses.findFirst({ where: eq(courses.id, courseId) })
   if (!course) notFound()
-
-  const session = await verifySession()
   const isOwner = course.creatorId === session.userId
 
   // Private courses only visible to owner
