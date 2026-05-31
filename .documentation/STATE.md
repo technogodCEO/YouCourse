@@ -271,3 +271,15 @@ userProgress
 - Creator: swap individual videos after generation
 - Discovery: public course catalog with keyword search and filtering
 - Monetization: private course paywall
+
+### LLM Tier System (monetization-linked)
+
+Multiple generation quality tiers backed by different models, gated by subscription plan:
+
+| Tier | Model | Strategy | Notes |
+|------|-------|----------|-------|
+| Free | `llama-4-scout` (current) | Parallel | Fast, cheap, good enough |
+| Pro | `llama-4-maverick` or `claude-sonnet` | Parallel | Higher quality questions |
+| Premium | `claude-opus` | Sequential (chained) | Slowest, most accurate — each step informed by prior |
+
+**Sequential vs parallel:** parallel runs all lesson generations simultaneously (current approach — fast). Sequential chains them — curriculum informs video search, transcript informs question generation, prior questions inform subsequent ones — slower but more coherent across lessons. Worth exploring for premium tier where latency is acceptable.
