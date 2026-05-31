@@ -5,9 +5,9 @@ import { useRouter } from "next/navigation"
 import { generateCourse } from "@/actions/generate-course"
 
 const presets = [
-  { value: "quick", label: "Quick", description: "3 lessons" },
-  { value: "standard", label: "Standard", description: "6 lessons" },
-  { value: "long", label: "Long", description: "10 lessons" },
+  { value: "quick", label: "Quick", description: "Essential concepts only" },
+  { value: "standard", label: "Standard", description: "Balanced coverage" },
+  { value: "long", label: "Long", description: "Comprehensive deep dive" },
 ] as const
 
 export function GenerateForm() {
