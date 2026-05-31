@@ -76,7 +76,7 @@ export async function generateCourse(
           }).where(eq(lessons.id, lessonId))
 
           const transcript = await fetchTranscript(video.videoId)
-          const qs = await generateQuestions(transcript, lessonTopic, video.title)
+          const qs = await generateQuestions(transcript, lessonTopic, video.title, video.durationSeconds)
 
           await db.update(lessons).set({
             transcriptCached: transcript !== null ? "true" : null,
