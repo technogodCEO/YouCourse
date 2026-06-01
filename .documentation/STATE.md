@@ -264,13 +264,27 @@ userProgress
 
 ## v2 Backlog
 
-- Learner: request additional questions (served from cached transcript, no new LLM call)
-- Learner: flag a question as incorrect/unclear
-- Learner: course completion record/certificate
-- Creator: review and edit curriculum before video search runs
-- Creator: swap individual videos after generation
-- Discovery: public course catalog with keyword search and filtering
-- Monetization: private course paywall
+v2 is phased. See `ROADMAP.md` for the full plan. Monetization deferred to v3.
+
+**Phase 1 — Creator Pipeline Fixes**
+- New `video_cache` table keyed by `youtubeVideoId` — deduplicates transcript + metadata fetches across courses; `lessons` drops `transcriptCached`, `videoTitle`, `videoDurationSeconds` in favour of a join
+- Creator can swap a bad video on any lesson (replaces video + regenerates questions)
+- Creator can retry question generation on lessons where transcript was unavailable
+- Creator can delete a broken lesson (cascades to questions + progress rows)
+
+**Phase 2 — Learner Polish**
+- On-demand question sets: unlimited batches from cached transcript; `questions.setIndex` (0 = original, 1+ = on-demand); pro gate deferred to v3
+- Question flagging: `question_flags` table; creators see flag counts per question
+- Completion records: `course_completions` table; shareable `/learn/[courseId]/complete` page
+
+**Phase 3 — Discovery**
+- Public catalog at `/catalog` — anonymous browsing, cached with short TTL
+- Keyword search via Postgres `ILIKE` on title + topic
+- Length filter chips; subject-area filter deferred
+- `generateMetadata` on public course pages for SEO; private pages get `noindex`
+
+**Dropped**
+- ~~Creator: review and edit curriculum before video search runs~~ — violates AI-first philosophy
 
 ### LLM Tier System (monetization-linked)
 

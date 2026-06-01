@@ -16,28 +16,43 @@ All four phases complete. Core learning loop is live: topic → AI-generated cou
 
 ---
 
-## v2 — Planned
+## v2 — In Progress
 
-### Enhanced Learning
-- **LRNN-v2-01** Learner requests additional questions (from cached transcript — no new LLM call)
-- **LRNN-v2-02** Learner flags a question as incorrect/unclear
-- **LRNN-v2-03** Completion record issued when course is finished
+Three phases. Monetization deferred to v3. Full design spec: `docs/superpowers/specs/2026-06-01-v2-roadmap-design.md`.
 
-### Enhanced Creation
-- **CGEN-v2-01** Creator reviews/edits generated curriculum before video search runs
-- **CGEN-v2-02** Creator swaps individual videos for alternatives post-generation
-- **CGEN-v2-03** Creator reorders or removes lessons after publishing
+### Phase 1 — Creator Pipeline Fixes
 
-### Discovery
-- **CTLG-v2-01** Public course catalog (browsable)
-- **CTLG-v2-02** Keyword search by topic
-- **CTLG-v2-03** Filter by length or subject
-- **CTLG-v2-04** Anonymous catalog browsing
+Fix AI implementation failures without second-guessing AI decisions. Creators don't know exactly what they need — that's why the AI builds the curriculum. v2 gives them tools to fix concrete mistakes, not override the AI's choices.
 
-### Monetization
-- **MON-v2-01** Private course paywall
-- **MON-v2-02** Creator receives payment on purchase
-- **MON-v2-03** Subscription tiers with tiered LLM quality — Free (Scout/parallel), Pro (Maverick or Sonnet/parallel), Premium (Opus/sequential). Sequential generation is slower but produces more coherent courses as each step is informed by prior outputs.
+| Feature | Description |
+|---------|-------------|
+| Video cache | New `video_cache` table keyed by `youtubeVideoId`. Deduplicates transcript + metadata fetches when multiple courses land on the same video. |
+| Swap video | Replace a bad video on one lesson — reruns YouTube search, regenerates questions from new transcript. |
+| Retry questions | Re-attempt transcript fetch + question generation on lessons where transcript was unavailable at creation time. |
+| Delete lesson | Remove a broken lesson; cascades to questions and progress rows. |
+
+### Phase 2 — Learner Polish
+
+| Feature | Description |
+|---------|-------------|
+| On-demand question sets | Unlimited additional question batches generated from cached transcript. Stored with `questions.setIndex` (0 = original, 1+ = on-demand). Pro gate deferred to v3. |
+| Question flagging | Single-tap flag → `question_flags` table. Creators see flag counts per question. Questions stay live — creators decide what to fix. |
+| Completion records | `course_completions` table written on final quiz pass. Shareable `/learn/[courseId]/complete` page. Dashboard separates completed from in-progress. |
+
+### Phase 3 — Discovery
+
+| Feature | Description |
+|---------|-------------|
+| Public catalog | `/catalog` — anonymous browsing, all `visibility = 'public'` courses, cached with short TTL. |
+| Search | Postgres `ILIKE` on `courses.title` and `courses.topic`. |
+| Length filter | Quick / Standard / Long chips. Subject-area filter deferred (no usage data yet). |
+| SEO | `generateMetadata` on public course pages. Private pages get `noindex`. |
+
+### v3 — Monetization (deferred)
+
+- Private course paywall
+- Creator receives payment on purchase
+- Subscription tiers with tiered LLM quality (Scout free → Maverick pro → R1-chain premium)
 
 ---
 
