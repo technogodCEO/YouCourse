@@ -8,6 +8,8 @@
 
 **Tech Stack:** Next.js 16 App Router, Drizzle ORM + Neon, Groq llama-4-scout via Vercel AI SDK, `react-youtube` (unchanged), Tailwind CSS v4, TypeScript strict.
 
+**Branch strategy:** Execute on branch `v2/phase1` cut from `main`. All commits in this plan go to that branch. Open a PR to `main` when all tasks are complete.
+
 ---
 
 ## File Map
@@ -142,7 +144,7 @@ export const userProgress = pgTable("user_progress", {
 }))
 ```
 
-**Note:** `passwordResetTokens` was in the original schema — include it. The `transcriptStatus` field is removed from `lessons` entirely; its state now lives in `video_cache.transcriptStatus`.
+**Note:** `passwordResetTokens` is currently absent from `schema.ts` (the file ends at `userProgress`) but the table exists in the DB and is used by the password reset flow. The rewrite above adds it back — this is intentional. The `transcriptStatus` field is removed from `lessons` entirely; its state now lives in `video_cache.transcriptStatus`.
 
 - [ ] **Step 2: Push schema changes to the database**
 
