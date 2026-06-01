@@ -19,6 +19,7 @@ All project state lives in `.documentation/`:
 | `UI-BRAND.md` | Color system, typography, component primitives, accessibility |
 | `SECURITY-DEFERRED.md` | Known security issues deferred with rationale |
 | `HISTORY.md` | Record of all executed plans and key decisions |
+| `IDEAS.md` | Long-horizon ideas, strategic notes, unvetted concepts |
 | `.planning/` | Active plans only — work in progress |
 
 **Start here for context:** Read `STATE.md` first, then `ROADMAP.md`. For UI work, read `UI-BRAND.md` before writing any styles.
