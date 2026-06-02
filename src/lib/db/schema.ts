@@ -71,6 +71,10 @@ export const lessonsRelations = relations(lessons, ({ one }) => ({
     fields: [lessons.youtubeVideoId],
     references: [videoCache.youtubeVideoId],
   }),
+  course: one(courses, {
+    fields: [lessons.courseId],
+    references: [courses.id],
+  }),
 }))
 
 export const questions = pgTable("questions", {
