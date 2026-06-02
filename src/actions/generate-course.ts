@@ -1,7 +1,7 @@
 "use server"
 
 import { db } from "@/lib/db"
-import { courses, lessons, questions } from "@/lib/db/schema"
+import { courses, lessons, questions, videoCache } from "@/lib/db/schema"
 import { verifySession } from "@/lib/dal"
 import { generateCurriculum } from "@/lib/ai/curriculum"
 import { searchYouTubeVideo } from "@/lib/youtube/search"
@@ -44,44 +44,53 @@ export async function generateCourse(
 
     const lessonTopics = await generateCurriculum(topic, lengthPreset)
 
-    // Insert all lesson stubs sequentially to preserve position order
     const lessonRows: { id: string; topic: string }[] = []
     for (let i = 0; i < lessonTopics.length; i++) {
       const [row] = await db
         .insert(lessons)
-        .values({
-          courseId,
-          position: i,
-          topic: lessonTopics[i],
-          transcriptStatus: "pending",
-        })
+        .values({ courseId, position: i, topic: lessonTopics[i] })
         .returning({ id: lessons.id })
       lessonRows.push({ id: row.id, topic: lessonTopics[i] })
     }
 
-    // Process all lessons in parallel — errors are isolated per lesson
     await Promise.all(
       lessonRows.map(async ({ id: lessonId, topic: lessonTopic }) => {
         try {
           const video = await searchYouTubeVideo(lessonTopic)
-          if (!video) {
-            await db.update(lessons).set({ transcriptStatus: "unavailable" }).where(eq(lessons.id, lessonId))
-            return
+          if (!video) return
+
+          const cached = await db.query.videoCache.findFirst({
+            where: eq(videoCache.youtubeVideoId, video.videoId),
+          })
+
+          if (!cached) {
+            const transcriptText = await fetchTranscript(video.videoId)
+            await db.insert(videoCache).values({
+              youtubeVideoId: video.videoId,
+              title: video.title,
+              durationSeconds: video.durationSeconds,
+              transcriptText,
+              transcriptStatus: transcriptText ? "available" : "unavailable",
+            }).onConflictDoNothing()
           }
 
-          await db.update(lessons).set({
-            youtubeVideoId: video.videoId,
-            videoTitle: video.title,
-            videoDurationSeconds: video.durationSeconds,
-          }).where(eq(lessons.id, lessonId))
+          const cacheRow = cached ?? await db.query.videoCache.findFirst({
+            where: eq(videoCache.youtubeVideoId, video.videoId),
+          })
 
-          const transcript = await fetchTranscript(video.videoId)
-          const qs = await generateQuestions(transcript, lessonTopic, video.title, video.durationSeconds)
+          if (!cacheRow) return
 
-          await db.update(lessons).set({
-            transcriptCached: transcript !== null ? "true" : null,
-            transcriptStatus: "unavailable",
-          }).where(eq(lessons.id, lessonId))
+          const qs = await generateQuestions(
+            cacheRow.transcriptText,
+            lessonTopic,
+            cacheRow.title,
+            cacheRow.durationSeconds
+          )
+
+          await db.update(lessons)
+            .set({ youtubeVideoId: video.videoId })
+            .where(eq(lessons.id, lessonId))
+
           await db.insert(questions).values(
             qs.map((q, i) => ({
               lessonId,
@@ -92,7 +101,7 @@ export async function generateCourse(
             }))
           )
         } catch {
-          await db.update(lessons).set({ transcriptStatus: "unavailable" }).where(eq(lessons.id, lessonId))
+          // Leave lesson with no video — creator can fix via swap
         }
       })
     )

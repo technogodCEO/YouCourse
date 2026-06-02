@@ -1,14 +1,15 @@
 "use server"
 
 import { db } from "@/lib/db"
-import { courses, lessons, questions, userProgress } from "@/lib/db/schema"
+import { courses, lessons, questions, userProgress, courseCompletions } from "@/lib/db/schema"
 import { verifySession } from "@/lib/dal"
 import { and, asc, eq } from "drizzle-orm"
 
 export async function submitQuiz(
   lessonId: string,
-  answers: number[]
-): Promise<{ passed: boolean; score: number; wrongIndexes?: number[] }> {
+  answers: number[],
+  setIndex: number = 0
+): Promise<{ passed: boolean; score: number; wrongIndexes?: number[]; courseCompleted?: boolean }> {
   let session: { userId: string }
   try {
     session = await verifySession()
@@ -16,7 +17,6 @@ export async function submitQuiz(
     return { passed: false, score: 0 }
   }
 
-  // Verify the lesson exists and belongs to an accessible course
   const lesson = await db.query.lessons.findFirst({ where: eq(lessons.id, lessonId) })
   if (!lesson) return { passed: false, score: 0 }
 
@@ -27,7 +27,7 @@ export async function submitQuiz(
   }
 
   const qs = await db.query.questions.findMany({
-    where: eq(questions.lessonId, lessonId),
+    where: and(eq(questions.lessonId, lessonId), eq(questions.setIndex, setIndex)),
     orderBy: [asc(questions.position)],
   })
 
@@ -40,13 +40,36 @@ export async function submitQuiz(
   const score = Math.round((correct / qs.length) * 100)
   const passed = score >= 70
 
-  if (passed) {
-    await db
-      .update(userProgress)
-      .set({ passedQuiz: true, completedAt: new Date() })
-      .where(and(eq(userProgress.userId, session.userId), eq(userProgress.lessonId, lessonId)))
-    return { passed, score }
+  if (!passed) return { passed, score, wrongIndexes }
+
+  await db
+    .update(userProgress)
+    .set({ passedQuiz: true, completedAt: new Date() })
+    .where(and(eq(userProgress.userId, session.userId), eq(userProgress.lessonId, lessonId)))
+
+  const allLessons = await db.query.lessons.findMany({
+    where: eq(lessons.courseId, lesson.courseId),
+  })
+  const allProgress = await db.query.userProgress.findMany({
+    where: and(
+      eq(userProgress.userId, session.userId),
+      eq(userProgress.courseId, lesson.courseId)
+    ),
+  })
+  const passedLessonIds = new Set(
+    allProgress.filter((p) => p.passedQuiz).map((p) => p.lessonId)
+  )
+  passedLessonIds.add(lessonId)
+
+  const allPassed = allLessons.every((l) => !l.youtubeVideoId || passedLessonIds.has(l.id))
+
+  if (allPassed) {
+    await db.insert(courseCompletions).values({
+      userId: session.userId,
+      courseId: lesson.courseId,
+    }).onConflictDoNothing()
+    return { passed, score, courseCompleted: true }
   }
 
-  return { passed, score, wrongIndexes }
+  return { passed, score }
 }

@@ -16,7 +16,7 @@ All four phases complete. Core learning loop is live: topic → AI-generated cou
 
 ---
 
-## v2 — In Progress
+## v2 — Shipped (2026-06-02)
 
 Three phases. Monetization deferred to v3. Full design spec: `docs/superpowers/specs/2026-06-01-v2-roadmap-design.md`.
 

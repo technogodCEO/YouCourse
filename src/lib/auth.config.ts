@@ -1,6 +1,6 @@
 import type { NextAuthConfig } from "next-auth"
 
-const protectedRoutes = ["/dashboard", "/courses", "/generate", "/learn"]
+const protectedRoutes = ["/dashboard", "/generate", "/learn"]
 
 export const authConfig: NextAuthConfig = {
   pages: { signIn: "/login" },

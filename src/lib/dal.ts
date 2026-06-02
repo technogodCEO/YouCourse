@@ -11,6 +11,12 @@ export async function verifySession() {
   return { isAuth: true, userId: session.user.id as string }
 }
 
+export async function getOptionalSession(): Promise<{ userId: string } | null> {
+  const session = await auth()
+  if (!session?.user?.id) return null
+  return { userId: session.user.id as string }
+}
+
 export async function getUser() {
   const session = await auth()
   if (!session?.user?.id) return null
