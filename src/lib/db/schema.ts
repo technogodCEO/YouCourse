@@ -48,29 +48,18 @@ export const courses = pgTable("courses", {
   createdAt: timestamp("created_at").defaultNow().notNull(),
 })
 
-export const videoCache = pgTable("video_cache", {
-  youtubeVideoId: text("youtube_video_id").primaryKey(),
-  title: text("title").notNull(),
-  durationSeconds: integer("duration_seconds").notNull(),
-  transcriptText: text("transcript_text"),
-  transcriptStatus: text("transcript_status").notNull().default("unavailable"),
-  fetchedAt: timestamp("fetched_at").defaultNow().notNull(),
-})
-
 export const lessons = pgTable("lessons", {
   id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
   courseId: text("course_id").notNull().references(() => courses.id, { onDelete: "cascade" }),
   position: integer("position").notNull(),
   topic: text("topic").notNull(),
-  youtubeVideoId: text("youtube_video_id").references(() => videoCache.youtubeVideoId, { onDelete: "set null" }),
+  youtubeVideoId: text("youtube_video_id"),
+  videoTitle: text("video_title"),
+  videoDuration: integer("video_duration"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
 })
 
 export const lessonsRelations = relations(lessons, ({ one }) => ({
-  videoCache: one(videoCache, {
-    fields: [lessons.youtubeVideoId],
-    references: [videoCache.youtubeVideoId],
-  }),
   course: one(courses, {
     fields: [lessons.courseId],
     references: [courses.id],

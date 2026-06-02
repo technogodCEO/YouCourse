@@ -1,7 +1,7 @@
 "use server"
 
 import { db } from "@/lib/db"
-import { courses, lessons, questions, videoCache } from "@/lib/db/schema"
+import { courses, lessons, questions } from "@/lib/db/schema"
 import { verifySession } from "@/lib/dal"
 import { searchYouTubeVideo } from "@/lib/youtube/search"
 import { fetchTranscript } from "@/lib/youtube/transcript"
@@ -25,38 +25,19 @@ export async function swapVideo(
   const video = await searchYouTubeVideo(searchQuery.trim())
   if (!video) return { error: "No YouTube video found for that query" }
 
-  const cached = await db.query.videoCache.findFirst({
-    where: eq(videoCache.youtubeVideoId, video.videoId),
-  })
-
-  if (!cached) {
-    const transcriptText = await fetchTranscript(video.videoId)
-    await db.insert(videoCache).values({
-      youtubeVideoId: video.videoId,
-      title: video.title,
-      durationSeconds: video.durationSeconds,
-      transcriptText,
-      transcriptStatus: transcriptText ? "available" : "unavailable",
-    }).onConflictDoNothing()
-  }
-
-  const cacheRow = cached ?? await db.query.videoCache.findFirst({
-    where: eq(videoCache.youtubeVideoId, video.videoId),
-  })
-
-  if (!cacheRow) return { error: "Failed to cache video" }
+  const transcriptText = await fetchTranscript(video.videoId)
 
   const newQuestions = await generateQuestions(
-    cacheRow.transcriptText,
+    transcriptText,
     lesson.topic,
-    cacheRow.title,
-    cacheRow.durationSeconds
+    video.title,
+    video.durationSeconds
   )
 
   await db.delete(questions).where(eq(questions.lessonId, lessonId))
 
   await db.update(lessons)
-    .set({ youtubeVideoId: video.videoId })
+    .set({ youtubeVideoId: video.videoId, videoTitle: video.title, videoDuration: video.durationSeconds })
     .where(eq(lessons.id, lessonId))
 
   await db.insert(questions).values(

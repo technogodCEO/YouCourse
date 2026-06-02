@@ -59,14 +59,14 @@ src/
   actions/
     auth.ts                  signup, login, logout
     password-reset.ts        requestPasswordReset, applyPasswordReset
-    generate-course.ts       full pipeline — checks video_cache before fetching transcript
+    generate-course.ts       full pipeline — fetches transcript fresh, stores title/duration on lesson
     update-course.ts         title, description, visibility
     delete-course.ts         owner-only delete
     init-progress.ts         seed userProgress rows when learner starts course
     submit-quiz.ts           grade by setIndex, update progress, detect course completion
     skip-lesson.ts           mark no-video lessons complete
-    swap-video.ts            replace lesson video + regenerate questions   [v2]
-    retry-questions.ts       re-fetch transcript + regenerate questions    [v2]
+    swap-video.ts            replace lesson video, fetch fresh transcript, regenerate questions   [v2]
+    retry-questions.ts       re-fetch transcript + regenerate questions                          [v2]
     delete-lesson.ts         delete lesson + renumber siblings             [v2]
     generate-question-set.ts create additional question batch from cache   [v2]
     flag-question.ts         toggle question flag for current user         [v2]
@@ -120,11 +120,6 @@ accounts, verificationTokens           (Auth.js adapter tables)
 passwordResetTokens
   id, email, token, expires
 
-video_cache                            [v2 — new]
-  youtubeVideoId (PK), title, durationSeconds
-  transcriptText, transcriptStatus ("available" | "unavailable")
-  fetchedAt
-
 courses
   id, creatorId → users.id, title, topic, description
   lengthPreset               "quick" | "standard" | "long"
@@ -134,9 +129,9 @@ courses
 
 lessons
   id, courseId → courses.id, position (0-indexed), topic
-  youtubeVideoId → video_cache.youtubeVideoId (nullable, FK set null on delete)
+  youtubeVideoId (nullable text — no FK)
+  videoTitle (nullable text), videoDuration (nullable int, seconds)
   createdAt
-  [REMOVED in v2: videoTitle, videoDurationSeconds, transcriptCached, transcriptStatus]
 
 questions
   id, lessonId → lessons.id, position
@@ -162,7 +157,7 @@ userProgress
 
 ### Drizzle Relations
 
-- `lessonsRelations`: `videoCache` (one), `course` (one — required for `with:{ lessons }` on courses)
+- `lessonsRelations`: `course` (one — required for `with:{ lessons }` on courses)
 - `coursesRelations`: `creator` (one → users), `lessons` (many)
 - `usersRelations`: `courses` (many)
 
@@ -183,10 +178,9 @@ userProgress
    - Inserts lesson stubs
    - Parallel `Promise.all` per lesson:
      - `searchYouTubeVideo` → YouTube Data API v3
-     - **Check `video_cache`** before fetching transcript (v2)
-     - Cache miss: `fetchTranscript` → insert `video_cache` row
+     - `fetchTranscript` → YouTube captions (fresh, not cached)
      - `generateQuestions` → Groq → 5 questions (setIndex=0)
-     - Updates `lessons.youtubeVideoId`; inserts questions
+     - Updates `lessons.youtubeVideoId`, `videoTitle`, `videoDuration`; inserts questions
    - Sets `status: "ready"`
 
 ### Quiz Gate Flow (updated v2)
@@ -196,8 +190,8 @@ userProgress
 4. Returns `{ passed, score, courseCompleted? }`
 
 ### Creator Fix Flows (v2)
-- **Swap Video:** `swapVideo(lessonId, query)` — searches YouTube, populates cache, deletes old questions, inserts new
-- **Retry Questions:** `retryQuestions(lessonId)` — re-fetches transcript, updates cache, regenerates questions
+- **Swap Video:** `swapVideo(lessonId, query)` — searches YouTube, fetches transcript fresh, deletes old questions, updates lesson, inserts new questions
+- **Retry Questions:** `retryQuestions(lessonId)` — re-fetches transcript fresh, regenerates questions
 - **Delete Lesson:** `deleteLesson(lessonId)` — deletes lesson+questions+progress, renumbers siblings
 
 ---
@@ -222,11 +216,6 @@ userProgress
 - Groq `meta-llama/llama-4-scout-17b-16e-instruct` (structured outputs, cheap)
 - LLM calls server-only
 
-### Video Cache (v2)
-- `video_cache` table is append-only in normal operation; `retryQuestions` updates it in-place
-- `lessons.youtubeVideoId` FK has `onDelete: "set null"` — cache rows are never deleted
-- `onConflictDoNothing` on insert guards against race conditions in parallel generation
-
 ### Catalog (v2)
 - `unstable_cache` with 60s revalidation wraps the public courses query
 - In-memory filtering on the cached result — avoids per-request DB hits
@@ -245,6 +234,7 @@ userProgress
 - **YouTube captions** — transcript unavailable for many videos; questions generated from title/topic as fallback.
 - **Enum validation in Server Actions** — always do explicit string checks on `formData` values.
 - **`lessonsRelations` must include `course: one(courses)`** — Drizzle needs both sides of a `many()` relation or `with: { lessons }` on courses throws "not enough information to infer relation".
+- **Transcripts are not cached** — `fetchTranscript` is called fresh on every generation, swap, retry, and new question set. This trades extra YouTube API calls for zero storage cost.
 
 ---
 

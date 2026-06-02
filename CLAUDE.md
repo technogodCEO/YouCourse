@@ -42,7 +42,7 @@ All project state lives in `.documentation/`:
 
 ### Hard rules
 - LLM calls: **server-side only** — never from the client. Use `server-only` import guard on lib modules.
-- YouTube API: **called once at course creation**, result cached in DB. Never called per student view.
+- YouTube API: **called once at course creation** for video search. Transcripts fetched fresh on each question generation (not cached). Neither is ever called per student view.
 - Server Action inputs: **always validate enum values at runtime** — TypeScript types are compile-time only.
 - LLM output: **always use `generateObject` with a Zod schema** — do not parse freetext LLM responses.
 - Route protection: handled by `proxy.ts` + `verifySession()` in `dal.ts` — call `verifySession()` before any DB fetch.
@@ -66,7 +66,7 @@ src/
 proxy.ts          Next.js 16 route protection middleware
 ```
 
-Schema: `users → courses → lessons → questions`, `users → userProgress → lessons`
+Schema: `users → courses → lessons (videoTitle, videoDuration) → questions`, `users → userProgress → lessons`
 
 ---
 

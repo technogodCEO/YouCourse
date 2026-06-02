@@ -3,6 +3,7 @@
 import { db } from "@/lib/db"
 import { lessons, questions, userProgress } from "@/lib/db/schema"
 import { verifySession } from "@/lib/dal"
+import { fetchTranscript } from "@/lib/youtube/transcript"
 import { generateQuestions } from "@/lib/ai/questions"
 import { eq, and, max } from "drizzle-orm"
 
@@ -21,13 +22,12 @@ export async function generateQuestionSet(
 
   const lesson = await db.query.lessons.findFirst({
     where: eq(lessons.id, lessonId),
-    with: { videoCache: true },
   })
-  if (!lesson || !lesson.videoCache) return { error: "Lesson not found" }
+  if (!lesson) return { error: "Lesson not found" }
+  if (!lesson.youtubeVideoId) return { error: "noTranscript" }
 
-  if (lesson.videoCache.transcriptStatus !== "available") {
-    return { error: "noTranscript" }
-  }
+  const transcriptText = await fetchTranscript(lesson.youtubeVideoId)
+  if (!transcriptText) return { error: "noTranscript" }
 
   const existingQuestions = await db.query.questions.findMany({
     where: eq(questions.lessonId, lessonId),
@@ -46,10 +46,10 @@ export async function generateQuestionSet(
     : ""
 
   const newQuestions = await generateQuestions(
-    lesson.videoCache.transcriptText + avoidClause,
+    transcriptText + avoidClause,
     lesson.topic,
-    lesson.videoCache.title,
-    lesson.videoCache.durationSeconds
+    lesson.videoTitle ?? lesson.topic,
+    lesson.videoDuration ?? 0
   )
 
   await db.insert(questions).values(

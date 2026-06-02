@@ -16,10 +16,9 @@ type Props = {
   questionSets: QuestionSet[]
   flaggedQuestionIds: string[]
   alreadyPassed: boolean
-  hasTranscript: boolean
 }
 
-export function LessonPlayer({ courseId, lessonId, videoId, questionSets, flaggedQuestionIds, alreadyPassed, hasTranscript }: Props) {
+export function LessonPlayer({ courseId, lessonId, videoId, questionSets, flaggedQuestionIds, alreadyPassed }: Props) {
   const router = useRouter()
   const [showQuiz, setShowQuiz] = useState(alreadyPassed)
   const [passed, setPassed] = useState(alreadyPassed)

@@ -10,10 +10,9 @@ type Props = {
   lessonId: string
   lessonTopic: string
   hasVideo: boolean
-  transcriptAvailable: boolean
 }
 
-export function LessonActions({ lessonId, lessonTopic, hasVideo, transcriptAvailable }: Props) {
+export function LessonActions({ lessonId, lessonTopic, hasVideo }: Props) {
   const router = useRouter()
   const [swapOpen, setSwapOpen] = useState(false)
   const [swapQuery, setSwapQuery] = useState(lessonTopic)
@@ -62,7 +61,7 @@ export function LessonActions({ lessonId, lessonTopic, hasVideo, transcriptAvail
         >
           {loading === "swap" ? "Swapping…" : "Swap Video"}
         </button>
-        {hasVideo && !transcriptAvailable && (
+        {hasVideo && (
           <button
             type="button"
             disabled={loading !== null}

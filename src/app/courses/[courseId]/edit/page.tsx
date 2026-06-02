@@ -17,7 +17,6 @@ export default async function EditCoursePage({ params }: { params: Promise<{ cou
   const courseLessons = await db.query.lessons.findMany({
     where: eq(lessons.courseId, courseId),
     orderBy: [asc(lessons.position)],
-    with: { videoCache: true },
   })
 
   const lessonIds = courseLessons.map((l) => l.id)
@@ -60,15 +59,12 @@ export default async function EditCoursePage({ params }: { params: Promise<{ cou
                 <span className="text-[13px] font-mono text-[--text-secondary] mt-0.5 w-5 shrink-0">{i + 1}</span>
                 <div className="flex-1 min-w-0">
                   <p className="text-[15px] font-medium text-[--text-primary] leading-snug">
-                    {lesson.videoCache?.title ?? lesson.topic}
+                    {lesson.videoTitle ?? lesson.topic}
                   </p>
                   {!lesson.youtubeVideoId && (
                     <span className="inline-block mt-1 text-[12px] px-2 py-0.5 rounded-full border border-amber-300 text-amber-700 bg-amber-50">No video</span>
                   )}
-                  {lesson.videoCache && lesson.videoCache.transcriptStatus !== "available" && (
-                    <span className="inline-block mt-1 ml-1 text-[12px] px-2 py-0.5 rounded-full border border-[--border] text-[--text-secondary]">No transcript</span>
-                  )}
-                  <LessonActions lessonId={lesson.id} lessonTopic={lesson.topic} hasVideo={!!lesson.youtubeVideoId} transcriptAvailable={lesson.videoCache?.transcriptStatus === "available"} />
+                  <LessonActions lessonId={lesson.id} lessonTopic={lesson.topic} hasVideo={!!lesson.youtubeVideoId} />
                   {(() => {
                     const lessonQs = questionsByLesson.get(lesson.id) ?? []
                     const flaggedQs = lessonQs.filter((q) => q.flagCount > 0)

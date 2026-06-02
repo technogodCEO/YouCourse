@@ -15,7 +15,6 @@ export default async function LessonPage({ params }: { params: Promise<{ courseI
 
   const lesson = await db.query.lessons.findFirst({
     where: eq(lessons.id, lessonId),
-    with: { videoCache: true },
   })
   if (!lesson || lesson.courseId !== courseId) notFound()
   if (!lesson.youtubeVideoId) redirect(`/learn/${courseId}`)
@@ -79,7 +78,7 @@ export default async function LessonPage({ params }: { params: Promise<{ courseI
         <div className="mb-2">
           <span className="text-[13px] text-[--text-secondary]">Lesson {lesson.position + 1}</span>
           <h1 className="text-[22px] font-semibold text-[--text-primary] leading-snug mt-0.5">
-            {lesson.videoCache?.title ?? lesson.topic}
+            {lesson.videoTitle ?? lesson.topic}
           </h1>
         </div>
         {alreadyPassed && (
@@ -95,7 +94,6 @@ export default async function LessonPage({ params }: { params: Promise<{ courseI
             questionSets={questionSets}
             flaggedQuestionIds={flaggedQuestionIds}
             alreadyPassed={alreadyPassed}
-            hasTranscript={lesson.videoCache?.transcriptStatus === "available"}
           />
         </div>
       </div>

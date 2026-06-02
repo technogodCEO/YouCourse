@@ -1,7 +1,7 @@
 "use server"
 
 import { db } from "@/lib/db"
-import { courses, lessons, questions, videoCache } from "@/lib/db/schema"
+import { courses, lessons, questions } from "@/lib/db/schema"
 import { verifySession } from "@/lib/dal"
 import { fetchTranscript } from "@/lib/youtube/transcript"
 import { generateQuestions } from "@/lib/ai/questions"
@@ -14,7 +14,6 @@ export async function retryQuestions(
 
   const lesson = await db.query.lessons.findFirst({
     where: eq(lessons.id, lessonId),
-    with: { videoCache: true },
   })
   if (!lesson) return { error: "Lesson not found" }
   if (!lesson.youtubeVideoId) return { error: "Lesson has no video — use Swap Video instead" }
@@ -24,20 +23,11 @@ export async function retryQuestions(
 
   const transcriptText = await fetchTranscript(lesson.youtubeVideoId)
 
-  await db.update(videoCache)
-    .set({
-      transcriptText,
-      transcriptStatus: transcriptText ? "available" : "unavailable",
-      fetchedAt: new Date(),
-    })
-    .where(eq(videoCache.youtubeVideoId, lesson.youtubeVideoId))
-
-  const cacheRow = lesson.videoCache!
   const newQuestions = await generateQuestions(
     transcriptText,
     lesson.topic,
-    cacheRow.title,
-    cacheRow.durationSeconds
+    lesson.videoTitle ?? lesson.topic,
+    lesson.videoDuration ?? 0
   )
 
   await db.delete(questions).where(eq(questions.lessonId, lessonId))

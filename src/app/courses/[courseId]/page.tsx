@@ -70,7 +70,6 @@ export default async function CoursePage({ params }: { params: Promise<{ courseI
   const courseLessons = await db.query.lessons.findMany({
     where: eq(lessons.courseId, courseId),
     orderBy: [asc(lessons.position)],
-    with: { videoCache: true },
   })
 
   const hasStarted = session
@@ -103,8 +102,8 @@ export default async function CoursePage({ params }: { params: Promise<{ courseI
             <div key={lesson.id} className="flex items-start gap-4 rounded-xl border border-[--border] bg-[--bg-surface] p-4">
               <span className="text-[13px] font-mono text-[--text-secondary] mt-0.5 w-5 shrink-0">{i + 1}</span>
               <div className="flex-1 min-w-0">
-                <p className="text-[15px] font-medium text-[--text-primary] leading-snug">{lesson.videoCache?.title ?? lesson.topic}</p>
-                {lesson.videoCache?.durationSeconds && <p className="text-[13px] text-[--text-secondary] mt-0.5">{formatDuration(lesson.videoCache.durationSeconds)}</p>}
+                <p className="text-[15px] font-medium text-[--text-primary] leading-snug">{lesson.videoTitle ?? lesson.topic}</p>
+                {lesson.videoDuration && <p className="text-[13px] text-[--text-secondary] mt-0.5">{formatDuration(lesson.videoDuration)}</p>}
               </div>
             </div>
           ))}

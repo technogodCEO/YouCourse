@@ -27,7 +27,6 @@ export default async function LearnCoursePage({ params }: { params: Promise<{ co
   const courseLessons = await db.query.lessons.findMany({
     where: eq(lessons.courseId, courseId),
     orderBy: [asc(lessons.position)],
-    with: { videoCache: true },
   })
 
   const progressRows = await db.query.userProgress.findMany({
@@ -59,10 +58,10 @@ export default async function LearnCoursePage({ params }: { params: Promise<{ co
               </div>
               <div className="flex-1 min-w-0">
                 <p className={`text-[15px] font-medium leading-snug ${state === "locked" ? "text-[--text-secondary]" : "text-[--text-primary]"}`}>
-                  {lesson.videoCache?.title ?? lesson.topic}
+                  {lesson.videoTitle ?? lesson.topic}
                 </p>
-                {lesson.videoCache?.durationSeconds && (
-                  <p className="text-[13px] text-[--text-secondary] mt-0.5">{formatDuration(lesson.videoCache.durationSeconds)}</p>
+                {lesson.videoDuration && (
+                  <p className="text-[13px] text-[--text-secondary] mt-0.5">{formatDuration(lesson.videoDuration)}</p>
                 )}
               </div>
               {(state === "current" || state === "complete") && lesson.youtubeVideoId && (

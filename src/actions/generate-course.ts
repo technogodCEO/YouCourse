@@ -1,7 +1,7 @@
 "use server"
 
 import { db } from "@/lib/db"
-import { courses, lessons, questions, videoCache } from "@/lib/db/schema"
+import { courses, lessons, questions } from "@/lib/db/schema"
 import { verifySession } from "@/lib/dal"
 import { generateCurriculum } from "@/lib/ai/curriculum"
 import { searchYouTubeVideo } from "@/lib/youtube/search"
@@ -59,36 +59,17 @@ export async function generateCourse(
           const video = await searchYouTubeVideo(lessonTopic)
           if (!video) return
 
-          const cached = await db.query.videoCache.findFirst({
-            where: eq(videoCache.youtubeVideoId, video.videoId),
-          })
-
-          if (!cached) {
-            const transcriptText = await fetchTranscript(video.videoId)
-            await db.insert(videoCache).values({
-              youtubeVideoId: video.videoId,
-              title: video.title,
-              durationSeconds: video.durationSeconds,
-              transcriptText,
-              transcriptStatus: transcriptText ? "available" : "unavailable",
-            }).onConflictDoNothing()
-          }
-
-          const cacheRow = cached ?? await db.query.videoCache.findFirst({
-            where: eq(videoCache.youtubeVideoId, video.videoId),
-          })
-
-          if (!cacheRow) return
+          const transcriptText = await fetchTranscript(video.videoId)
 
           const qs = await generateQuestions(
-            cacheRow.transcriptText,
+            transcriptText,
             lessonTopic,
-            cacheRow.title,
-            cacheRow.durationSeconds
+            video.title,
+            video.durationSeconds
           )
 
           await db.update(lessons)
-            .set({ youtubeVideoId: video.videoId })
+            .set({ youtubeVideoId: video.videoId, videoTitle: video.title, videoDuration: video.durationSeconds })
             .where(eq(lessons.id, lessonId))
 
           await db.insert(questions).values(
